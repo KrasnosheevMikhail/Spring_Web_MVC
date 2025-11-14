@@ -1,17 +1,27 @@
 package ru.netology;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.Tomcat;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+import java.io.IOException;
+import java.nio.file.Files;
+
+public class Main {
+    public static void main(String[] args) throws LifecycleException, IOException {
+        final var tomcat = new Tomcat();
+        final var baseDir = Files.createTempDirectory("tomcat");
+        baseDir.toFile().deleteOnExit();
+        tomcat.setBaseDir(baseDir.toAbsolutePath().toString());
+
+        final var connector = new Connector();
+        connector.setPort(8080);
+        tomcat.setConnector(connector);
+
+        tomcat.getHost().setAppBase(".");
+        tomcat.addWebapp("", ".");
+
+        tomcat.start();
+        tomcat.getServer().await();
     }
 }
